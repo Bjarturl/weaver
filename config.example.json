@@ -1,77 +1,57 @@
 {
     "common_words": [
         "admin",
-        "administrator",
-        "password"
+        "password",
+        "Vor",
+        "Sumar"
     ],
     "common_numbers": [
-        "69",
         "123",
+        "2024",
         "321",
-        "1",
-        "7"
+        "1"
     ],
     "common_special_chars": [
         "!",
-        "@",
+        "?",
         "#",
         "$",
-        ".",
-        "_"
+        "."
     ],
     "custom": {
         "words": [
-            "Spring",
-            "Summer",
-            "Fall",
-            "Winter"
+            "company",
+            "dept"
         ],
         "numbers": [
-            "2025",
-            "2024"
+            "8675309"
         ],
         "personal_info": {
-            "name": "John Smith",
-            "ssn_last_4": "5769",
-            "wedding_anniversary": "2015-06-15",
-            "birth_date": "1985-03-22",
+            "name": "Jane Doe",
+            "birth_date": "1990-07-15",
             "pet_names": [
-                "Snati",
-                "Max"
+                "fido",
+                "milo"
             ],
-            "spouse_name": "Jane Smith",
-            "children_names": [
-                "Tommy"
-            ],
-            "company_name": "TechCorp",
-            "hometown": "Springfield",
-            "school": "StateUniversity",
-            "favorite_sports_team": "Lakers",
-            "street_address": "123 Main St",
-            "phone_number": "555-1234",
-            "nickname": "Johnny",
-            "fathers_name": "Robert Smith",
-            "mothers_name": "Mary Johnson"
+            "ssn": ""
         }
     },
-    "output_file": "wordlist.txt",
-    "external_wordlist": "leaked.txt",
+    "external_wordlist": "rockyou.txt",
     "all_cases": true,
     "min_length": 6,
-    "max_length": 12,
+    "max_length": 14,
+    "excluded_word_combinations": [
+        "sumar",
+        "vetur",
+        "haust",
+        "vor"
+    ],
     "word_patterns": [
         "{word}",
         "{word}{number}",
-        "{word}{special}",
-        "{word}{number}{special}",
-        "{number}{word}",
-        "{word}{word2}",
-        "{word}{word2}{number}",
-        "{word}{word2}{special}",
-        "{word}{word2}{number}{special}",
-        "{word}{number}{word2}",
-        "{word}{word2}{word3}",
-        "{word}{word2}{word3}{number}",
-        "{word}{word2}{word3}{special}"
-    ]
+        "{word}{special}{word2}",
+        "{number}{word2}",
+        "{word}{word2}{number}{special}"
+    ],
+    "output_file": "wordlist.txt"
 }
