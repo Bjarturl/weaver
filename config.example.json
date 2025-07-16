@@ -1,0 +1,75 @@
+{
+    "common_words": [
+        "admin",
+        "administrator",
+        "password"
+    ],
+    "common_numbers": [
+        "69",
+        "123",
+        "321",
+        "1",
+        "7"
+    ],
+    "common_special_chars": [
+        "!",
+        "@",
+        "#",
+        "$",
+        ".",
+        "_"
+    ],
+    "custom": {
+        "words": [
+            "Spring",
+            "Summer",
+            "Fall",
+            "Winter"
+        ],
+        "numbers": [
+            "2025",
+            "2024"
+        ],
+        "personal_info": {
+            "name": "John Smith",
+            "ssn_last_4": "5769",
+            "wedding_anniversary": "2015-06-15",
+            "birth_date": "1985-03-22",
+            "pet_names": [
+                "Snati",
+                "Max"
+            ],
+            "spouse_name": "Jane Smith",
+            "children_names": [
+                "Tommy"
+            ],
+            "company_name": "TechCorp",
+            "hometown": "Springfield",
+            "school": "StateUniversity",
+            "favorite_sports_team": "Lakers",
+            "street_address": "123 Main St",
+            "phone_number": "555-1234",
+            "nickname": "Johnny",
+            "fathers_name": "Robert Smith",
+            "mothers_name": "Mary Johnson"
+        }
+    },
+    "output_file": "wordlist.txt",
+    "external_wordlist": "leaked.txt",
+    "all_cases": true,
+    "word_patterns": [
+        "{word}",
+        "{word}{number}",
+        "{word}{special}",
+        "{word}{number}{special}",
+        "{number}{word}",
+        "{word}{word2}",
+        "{word}{word2}{number}",
+        "{word}{word2}{special}",
+        "{word}{word2}{number}{special}",
+        "{word}{number}{word2}",
+        "{word}{word2}{word3}",
+        "{word}{word2}{word3}{number}",
+        "{word}{word2}{word3}{special}"
+    ]
+}
