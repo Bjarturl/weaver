@@ -19,6 +19,7 @@ word_patterns = config["word_patterns"]
 all_cases = config.get("all_cases", False)
 min_length = config.get("min_length", 1)
 max_length = config.get("max_length", 100)
+excluded_word_combinations = config.get("excluded_word_combinations", [])
 
 
 def extract_ssn_standalone(personal_info):
@@ -379,6 +380,31 @@ def filter_passwords_by_length(passwords, min_length, max_length):
     return [p for p in passwords if min_length <= len(p) <= max_length]
 
 
+def filter_excluded_combinations(passwords, excluded_combinations):
+    if not excluded_combinations:
+        return passwords
+
+    filtered = []
+    for password in passwords:
+        password_lower = password.lower()
+        excluded = False
+
+        # Check if any two words from the excluded_combinations array appear together
+        words_in_password = []
+        for word in excluded_combinations:
+            if word.lower() in password_lower:
+                words_in_password.append(word.lower())
+
+        # If 2 or more excluded words are found in the password, exclude it
+        if len(words_in_password) >= 2:
+            excluded = True
+
+        if not excluded:
+            filtered.append(password)
+
+    return filtered
+
+
 def expand_patterns_for_all_cases(patterns, all_cases):
     if not all_cases:
         return patterns
@@ -479,6 +505,8 @@ pattern_passwords = generate_pattern_passwords(
 pattern_passwords = filter_passwords_with_multiple_numbers(pattern_passwords)
 pattern_passwords = filter_passwords_by_length(
     pattern_passwords, min_length, max_length)
+pattern_passwords = filter_excluded_combinations(
+    pattern_passwords, excluded_word_combinations)
 
 external_wordlist = load_external_wordlist(external_wordlist_file)
 
