@@ -113,6 +113,13 @@ https://target.com/author/username
 3. Run: `python main.py`
 4. Generated passwords saved to specified output file
 
+## Use Cases
+
+- WordPress penetration testing
+- Bug bounty hunting
+- Security assessments
+- Authorized penetration testing
+
 ## Security and Legal Notice
 
 **This tool is for authorized security testing and educational purposes only.**
@@ -121,10 +128,3 @@ https://target.com/author/username
 - Only use on systems you own or have explicit permission to test
 - Follow all applicable laws and regulations in your jurisdiction
 - This tool should not be used for malicious purposes
-
-## Use Cases
-
-- WordPress penetration testing
-- Bug bounty hunting
-- Security assessments
-- Authorized penetration testing

@@ -19,6 +19,25 @@ word_patterns = config["word_patterns"]
 all_cases = config.get("all_cases", False)
 
 
+def extract_ssn_standalone(personal_info):
+    standalone_ssns = []
+    import re
+
+    for key, value in personal_info.items():
+        if key.lower() == 'ssn' and value:
+            value_str = str(value)
+            numbers_in_text = re.findall(r'\d+', value_str)
+
+            for num in numbers_in_text:
+                if len(num) >= 9:
+                    standalone_ssns.append(num)
+                    standalone_ssns.append(num[-4:])
+                else:
+                    standalone_ssns.append(num)
+
+    return standalone_ssns
+
+
 def extract_personal_data(personal_info):
     extracted = []
     import re
@@ -45,30 +64,27 @@ def extract_personal_data(personal_info):
                         if word and len(word) > 1:
                             extracted.append(word.lower())
                 else:
-                    extracted.append(value_str)
+                    if key.lower() != 'ssn':
+                        extracted.append(value_str)
 
                 numbers_in_text = re.findall(r'\d+', value_str)
 
-                # Special handling for SSN-like patterns (9+ digits)
-                for num in numbers_in_text:
-                    if len(num) >= 9:
-                        extracted.append(num)  # Full SSN as standalone entry
-                        extracted.append(num[-4:])  # Last 4 digits
-                    else:
-                        extracted.append(num)
-
-                # Also check if the entire value is a standalone SSN (without text)
-                if value_str.isdigit() and len(value_str) >= 9:
-                    extracted.append(value_str)  # Full SSN standalone
-                    extracted.append(value_str[-4:])  # Last 4 digits
+                if key.lower() == 'ssn':
+                    for num in numbers_in_text:
+                        if len(num) >= 9:
+                            extracted.append(num)
+                            extracted.append(num[-4:])
+                        else:
+                            extracted.append(num)
+                else:
+                    extracted.extend(numbers_in_text)
 
     return [item for item in extracted if item and len(str(item)) > 0]
 
 
-# Extract personal data and combine with custom data
 personal_data = extract_personal_data(personal_info)
+standalone_ssns = extract_ssn_standalone(personal_info)
 
-# Separate personal data into words and numbers
 personal_words = []
 personal_numbers = []
 
@@ -79,7 +95,6 @@ for item in personal_data:
     else:
         personal_words.append(item_str)
 
-# Combine words and numbers separately
 all_words = common_words + custom_words + personal_words
 all_numbers = common_numbers + custom_numbers + personal_numbers
 
@@ -128,19 +143,16 @@ def generate_combo_wordlist(base_words, numbers, suffixes):
     combos = []
     for word in base_words:
         has_digit = any(c.isdigit() for c in word)
-        combos.append(word)  # Always include base
+        combos.append(word)
 
         if has_digit:
-            # Only add special chars
             specials_only = [s for s in suffixes if all(
                 not ch.isdigit() for ch in s)]
             for sc in specials_only:
                 combos.append(word + sc)
         else:
-            # Add number-only suffixes first
             for num in numbers:
                 combos.append(word + num)
-            # Then full suffixes (number + special)
             for suffix in suffixes:
                 combos.append(word + suffix)
     return combos
@@ -465,9 +477,12 @@ external_wordlist = load_external_wordlist(external_wordlist_file)
 with open(output_file, "w") as f:
     for password in pattern_passwords:
         f.write(password + "\n")
+    for ssn in standalone_ssns:
+        f.write(ssn + "\n")
     for word in external_wordlist:
         f.write(word + "\n")
 
 print(f"Generated {len(pattern_passwords)} from word patterns.")
 print(f"Added {len(external_wordlist)} from external wordlist.")
-print(f"Total written: {len(pattern_passwords) + len(external_wordlist)}")
+print(
+    f"Total written: {len(pattern_passwords) + len(standalone_ssns) + len(external_wordlist)}")
