@@ -1,158 +1,110 @@
-# Password Generator
+# Password Generator README
 
-A configurable password generator that creates targeted wordlists based on personal information and common patterns. This tool helps security professionals generate realistic password lists for testing and assessment purposes.
+This password generator produces targeted wordlists by combining configurable patterns, personal data, and common password elements. It’s designed to be:
 
-## Features
+- **Flexible**: Supports any number of `{wordX}`, `{number}`, and `{special}` placeholders with automatic case handling.
+- **Config-Driven**: All input comes from a single `config.json`; no code changes needed for new patterns or data.
+- **Efficient**: Generates combinations in a unified loop and filters duplicates, multi-digit substrings, and unwanted combinations in one pass.
 
-- **Personal Information Extraction**: Automatically extracts components from names, SSNs, dates, and other personal data
-- **Configurable Patterns**: Define custom password patterns using placeholders
-- **External Wordlist Integration**: Combine with existing wordlists (e.g., rockyou.txt) - used as-is without modification
-- **Common Password Patterns**: Includes real-world password patterns people actually use
-- **Case Sensitivity Control**: `all_cases` flag to automatically generate both lowercase and capitalized versions
+## Core Concepts and Design Decisions
 
-## Configuration
+### 1. Dynamic Placeholder Parsing
 
-Rename `config.example.json` to `config.json`. Customize:
+- Patterns can include any number of word tokens (`{word}`, `{word2}`, `{WORD3}`, etc.), plus `{number}` and `{special}`.
+- The code extracts placeholder names and their intended case (lower, capitalize, upper) at runtime.
+- This avoids hard-coding support for a fixed number of words and makes the engine future-proof.
+
+### 2. Single-Pass Combination Generation
+
+- All token pools (words, numbers, specials) are determined per pattern.
+- `itertools.product` generates every cross-combination in one unified loop, simplifying logic and ensuring consistency.
+- Passwords are collected into a `set` to remove duplicates immediately.
+
+### 3. Unified Filtering
+
+- Post-generation, each candidate goes through a concise filter that enforces:
+
+  - **Length bounds** (`min_length` / `max_length`).
+  - **Single numeric substring** (to avoid overly complex numeric patterns).
+  - **Excluded-word logic**: Any candidate containing two or more entries from `excluded_word_combinations` is dropped.
+
+- This keeps the wordlist focused and avoids manual pruning later.
+
+### 4. Config-First Approach
+
+- All parameterization lives in **one** `config.json`.
+- No code edits required for new words, numbers, specials, patterns, or filters.
+- Supports an **external wordlist** file, appended raw at the end.
+
+### 5. CLI Ergonomics
+
+- **`--config`**: specify an alternate config file.
+- **`--output`**: override the target output filename.
+- **`--verbose`**: switch on debug-level logging for troubleshooting.
+- Non-interactive design: no prompts or pauses; suitable for automation and CI/CD pipelines.
+
+## Installation and Setup
+
+1. **Clone or download** this repository.
+2. Copy `config.example.json` to `config.json`.
+3. Install Python (3.7+ recommended).
+
+## Configuration (`config.json`)
 
 ```json
 {
-  "common_words": ["admin", "password"],
-  "common_numbers": ["123", "2024", "69"],
-  "common_special_chars": ["!", "@", "#", "$"],
+  "common_words": ["admin", "password", "Vor", "Sumar"],
+  "common_numbers": ["123", "2024", "321", "1"],
+  "common_special_chars": ["!", "?", "#", "$", "."],
   "custom": {
-    "words": ["company", "department"],
-    "numbers": ["1234567"],
+    "words": ["company", "dept"],
+    "numbers": ["8675309"],
     "personal_info": {
-      "name": "John Smith",
-      "birth_date": "1985-03-22",
-      "pet_names": ["buddy", "max"],
-      "whatever": "Springfield",
-      ...
+      "name": "Jane Doe",
+      "birth_date": "1990-07-15",
+      "pet_names": ["fido", "milo"],
+      "ssn": ""
     }
   },
-  "external_wordlist": "leaked.txt",
+  "external_wordlist": "rockyou.txt",
   "all_cases": true,
   "min_length": 6,
-  "max_length": 20,
+  "max_length": 14,
+  "excluded_word_combinations": ["sumar", "vetur", "haust", "vor"],
   "word_patterns": [
     "{word}",
     "{word}{number}",
-    "{word}{word2}",
     "{word}{special}{word2}",
-    "{word}{word2}{number}",
+    "{number}{word2}",
     "{word}{word2}{number}{special}"
-  ]
+  ],
+  "output_file": "wordlist.txt"
 }
 ```
 
-**Key Points:**
+- **Placeholders**: any `{wordX}`, `{number}`, and `{special}` maps to its respective pool.
+- **`all_cases`**: duplicates patterns replacing `{word}` with `{Word}` for capitalized variants.
+- **`excluded_word_combinations`**: any password containing two or more of these substrings (case-insensitive) will be dropped.
 
-- **Personal info keys don't matter** - Use any field names you want (`name`, `hometown`, `pet`, etc.)
-- **All text is extracted** - Names split into words, numbers extracted, dates parsed
-- **Arrays supported** - `["pet1", "pet2"]` works for multiple values
-- **`all_cases: true`** - Automatically generates both `admin` and `Admin` from `{word}` patterns
-- **External wordlist** - Added as-is (no pattern processing)
-- **Length filtering** - `min_length` and `max_length` filter generated passwords by character count
-
-**Length Parameters:**
-
-- Useful if you've seen a video/screenshot of someone logging in and can count password length
-- Can rule out certain lengths based on password policy or observations
-- Example: `"min_length": 8, "max_length": 15` for corporate environments
-
-## Personal Information Gathering (OSINT)
-
-**Icelandic Resources:**
-
-- **[ja.is](https://ja.is)** - Phone directory, addresses, personal information
-- Your heimabanki - SSN lookup by name
-
-**General Sources:**
-
-- **Social Media** - [Facebook](https://facebook.com), [LinkedIn](https://linkedin.com), [Instagram](https://instagram.com), [Twitter/X](https://x.com)
-- **Google Search** - "name + city" or "name + company"
-- **Public Directories** - Phone numbers, addresses
-
-**What to Look For:**
-
-- Names, nicknames, family members
-- Birth dates, anniversaries, significant years
-- Locations, addresses, hometown
-- Sports teams, hobbies, interests
-- Pet names, company names
-- Phone numbers, partial SSNs
-
-## WordPress Username Enumeration
-
-**REST API Method:**
-
-```
-https://target.com/wp-json/wp/v2/users
-https://target.com?rest_route=wp/v2/users
-```
-
-**Author Archive URLs:**
-
-```
-https://target.com/?author=0
-https://target.com/?author=1
-https://target.com/author/username
-```
-
-**Login Error Messages:**
-
-- Try common usernames on `/wp-login.php`
-- Different error messages reveal if username exists
-
-**Tools:**
-
-- **wpscan**: `wpscan --url https://target.com --enumerate u`
-
-**Wayback Machine:**
-
-- Check `https://web.archive.org/web/*/target.com/wp-json/wp/v2/users`
-- Look for historical author pages and user listings
-- May reveal usernames that no longer exist on current site
-
-**Common WordPress Usernames:**
-
-- `admin`, `root`, `test`, `user`
-- Site name variations
-- Author names from posts/pages
-
-## Usage
-
-1. Gather target information using OSINT
-2. Add info to `config.json` e.g. under `personal_info` or `custom`.
-3. Run: `python main.py`
-4. Generated passwords saved to specified output file
-
-## Example Usage with ffuf
-
-**WordPress Login Brute Force:**
+## Running the Generator
 
 ```bash
-ffuf -w wordlist.txt -u https://target.com/wp-login.php -X POST -d "log=admin&pwd=FUZZ&wp-submit=Log+In" -H "User-Agent: Mozilla/5.0 (compatible; Bug Bounty Research)" -mc 200 -fs 1234
+# Default config.json → wordlist.txt
+python main.py
+
+# Alternate config and output path
+python main.py --config myconfig.json --output custom-list.txt
+
+# Verbose logging
+python main.py --verbose
 ```
 
-**API Endpoint Testing:**
+## Tips and Best Practices
 
-```bash
-ffuf -w wordlist.txt -u https://api.target.com/login -X POST -d '{"username":"admin","password":"FUZZ"}' -H "Content-Type: application/json" -H "User-Agent: Mozilla/5.0 (compatible; Security Research)" -mc 200,201
-```
-
-**Custom Headers for Bug Bounty:**
-
-```bash
-ffuf -w wordlist.txt -u https://target.com/admin -X POST -d "password=FUZZ" -H "X-Bug-Bounty: xxxxx" -mc 200,302
-```
-
-## Use Cases
-
-- WordPress penetration testing
-- Bug bounty hunting
-- Security assessments
-- Authorized penetration testing
+- **Pattern Design**: Keep patterns to the essential ones you need; avoid overly generic patterns unless necessary.
+- **Personal Data**: Use relevant personal info fields (names, dates, nicknames) but avoid leaving empty fields in the list if they’re unused.
+- **External Lists**: Append large, static lists (e.g., rockyou) with `external_wordlist`—pattern parsing is not applied to those entries.
+- **Filtering**: Tune `min_length`/`max_length` and exclusions to fit your targeting scope and policy constraints.
 
 ## Security and Legal Notice
 
