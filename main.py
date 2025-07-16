@@ -176,23 +176,23 @@ def generate_pattern_passwords(patterns, words, numbers, special_chars):
                 word_has_number = any(c.isdigit() for c in word)
 
                 if has_number and has_special:
-                    for i, number in enumerate(numbers):
-                        special = clean_special_chars[i % len(
-                            clean_special_chars)] if clean_special_chars else ""
-                        password = pattern
-                        if "{word}" in pattern:
-                            password = password.replace("{word}", word.lower())
-                        if "{Word}" in pattern:
-                            password = password.replace(
-                                "{Word}", capitalize_first(word))
+                    for number in numbers:
+                        for special in clean_special_chars:
+                            password = pattern
+                            if "{word}" in pattern:
+                                password = password.replace(
+                                    "{word}", word.lower())
+                            if "{Word}" in pattern:
+                                password = password.replace(
+                                    "{Word}", capitalize_first(word))
 
-                        if not word_has_number:
-                            password = password.replace("{number}", number)
-                        else:
-                            password = password.replace("{number}", "")
+                            if not word_has_number:
+                                password = password.replace("{number}", number)
+                            else:
+                                password = password.replace("{number}", "")
 
-                        password = password.replace("{special}", special)
-                        passwords.add(password)
+                            password = password.replace("{special}", special)
+                            passwords.add(password)
                 elif has_number:
                     if not word_has_number:
                         for number in numbers:
