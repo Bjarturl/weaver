@@ -38,6 +38,7 @@
     },
     "external_wordlist": "rockyou.txt",
     "all_cases": true,
+    "generalize_strings": true,
     "min_length": 6,
     "max_length": 14,
     "excluded_word_combinations": [

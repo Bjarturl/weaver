@@ -1,162 +1,112 @@
-# Password Generator README
+# Password Wordlist Generator
 
-This password generator produces targeted wordlists by combining configurable patterns, personal data, and common password elements. It’s designed to be:
+A flexible, config-driven tool for building targeted password lists from patterns, personal data, and common password elements.
 
-- **Flexible**: Supports any number of `{wordX}`, `{number}`, and `{special}` placeholders with automatic case handling.
-- **Config-Driven**: All input comes from a single `config.json`; no code changes needed for new patterns or data.
-- **Efficient**: Generates combinations in a unified loop and filters duplicates, multi-digit substrings, and unwanted combinations in one pass.
+- **No code changes needed**  
+  Everything lives in `config.json`: words, numbers, specials, patterns, filters.
 
----
+- **Free-form custom data**  
+  Under the top-level `"custom"` section you can add **any** keys—arrays or values of names, nicknames, dates, IDs, hobbies, whatever. The generator will recursively pick up every string or number, extract words, dates (YYYY-MM-DD → parts), and all digit-groups automatically.
 
-## Core Concepts and Design Decisions
+  > _Note_: using a `"personal_info"` object is just a common convention, not a requirement.
 
-### 1. Dynamic Placeholder Parsing
+- **Dynamic patterns**  
+  Use `{word}`, `{word2}`, `{WORD3}`, `{number}`, `{special}` in your patterns.  
+  Placeholders are parsed at runtime, so you can add as many as you like.
 
-- Patterns can include any number of word tokens (`{word}`, `{word2}`, `{WORD3}`, etc.), plus `{number}` and `{special}`.
-- The code extracts placeholder names and their intended case (lower, capitalize, upper) at runtime.
-- This avoids hard-coding support for a fixed number of words and makes the engine future-proof.
+- **Built-in filters**
 
-### 2. Single-Pass Combination Generation
+  - Length (`min_length` / `max_length`)
+  - Single numeric substring (avoid multiple number blocks)
+  - Exclusions: any password containing any pair from any exclusion group in `excluded_word_combinations` is dropped.
 
-- All token pools (words, numbers, specials) are determined per pattern.
-- `itertools.product` generates every cross-combination in one unified loop, simplifying logic and ensuring consistency.
-- Passwords are collected into a `set` to remove duplicates immediately.
+- **String processing options**
 
-### 3. Unified Filtering
+  - `all_cases`: If `true`, automatically generates capitalized versions of `{word}` patterns (e.g., `{word}` → `{Word}`)
+  - `generalize_strings`: Controls accent/special character removal from extracted words
+    - `true` (default): Replace accented characters with ASCII equivalents (e.g., "grágás" → "gragas")
+    - `false`: Keep original characters as-is
+    - `"both"`: Include both original and generalized versions
 
-- Post-generation, each candidate goes through a concise filter that enforces:
+- **External lists**  
+  Append a raw wordlist via `external_wordlist` — no pattern filling applied.
 
-  - **Length bounds** (`min_length` / `max_length`).
-  - **Single numeric substring** (to avoid overly complex numeric patterns).
-  - **Excluded-word logic**: Any candidate containing two or more entries from `excluded_word_combinations` is dropped.
+- **CLI options**
+  ```bash
+  python main.py [--config other.json] [--output list.txt] [--verbose]
+  ```
 
-- This keeps the wordlist focused and avoids manual pruning later.
+## Quick Start
 
-### 4. Config-First Approach
-
-- All parameterization lives in **one** `config.json`.
-- No code edits required for new words, numbers, specials, patterns, or filters.
-- Supports an **external wordlist** file, appended raw at the end.
-
-### 5. CLI Ergonomics
-
-- **`--config`**: specify an alternate config file.
-- **`--output`**: override the target output filename.
-- **`--verbose`**: switch on debug-level logging for troubleshooting.
-- Non-interactive design: no prompts or pauses; suitable for automation and CI/CD pipelines.
-
----
-
-## Installation and Setup
-
-1. **Clone or download** this repository.
-2. Copy `config.example.json` to `config.json`.
-3. Install Python (3.7+ recommended).
-4. (Optional) Create a virtual environment:
-
+1. Copy `config.example.json` → `config.json`.
+2. Tweak words, numbers, specials, patterns, filters.
+3. Under `"custom"`, add **any** fields — pick the key names to be convenient for you to fill out.
+4. Run:
    ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
+   python main.py
    ```
+5. Your wordlist lands in `wordlist.txt` (or your chosen `output_file`).
 
-5. (Optional) Install dependencies if extended logging or JSON schema validation is added in the future.
+## Configuration Options
 
----
+### Core Settings
 
-## Configuration (`config.json`)
+- `output_file`: Name of the generated wordlist file
+- `external_wordlist`: Path to an external wordlist to append (optional)
+- `min_length` / `max_length`: Password length constraints
+
+### Processing Options
+
+- `all_cases`: If `true`, automatically generates capitalized versions of `{word}` patterns
+- `generalize_strings`: Controls accent/special character removal from extracted words
+  - `true` (default): Replace accented characters with ASCII equivalents
+  - `false`: Keep original characters as-is
+  - `"both"`: Include both original and generalized versions
+
+### Word Sources
+
+- `common_words`: List of common words to use in patterns
+- `common_numbers`: List of common numbers to use in patterns
+- `common_special_chars`: List of special characters to use in patterns
+- `custom`: Nested object containing personal data (any structure allowed)
+
+### Pattern Generation
+
+- `word_patterns`: List of patterns using placeholders like `{word}`, `{number}`, `{special}`
+- `excluded_word_combinations`: List of word groups - passwords containing any pair from the same group will be excluded
+
+## Custom Data Extraction
+
+Every value under the `"custom"` section is processed—no fixed key names required:
 
 ```json
-{
-  "common_words": ["admin", "password", "Vor", "Sumar"],
-  "common_numbers": ["123", "2024", "321", "1"],
-  "common_special_chars": ["!", "?", "#", "$", "."],
-  "custom": {
-    "words": ["company", "dept"],
-    "numbers": ["8675309"],
-    "personal_info": {
-      "name": "Jane Doe",
-      "birth_date": "1990-07-15",
-      "pet_names": ["fido", "milo"],
-      "ssn": ""
-    }
+"custom": {
+  "personal_info": {
+    "full_name": "Jane Doe",
+    "pets": ["fido", "milo"]
   },
-  "external_wordlist": "rockyou.txt",
-  "all_cases": true,
-  "min_length": 6,
-  "max_length": 14,
-  "excluded_word_combinations": ["sumar", "vetur", "haust", "vor"],
-  "word_patterns": [
-    "{word}",
-    "{word}{number}",
-    "{word}{special}{word2}",
-    "{number}{word2}",
-    "{word}{word2}{number}{special}"
-  ],
-  "output_file": "wordlist.txt"
+  "hobbies": ["skiing", "gaming"],
+  "national_id": "0123456789"
 }
 ```
 
-- **Placeholders**: any `{wordX}`, `{number}`, and `{special}` maps to its respective pool.
-- **`all_cases`**: duplicates patterns replacing `{word}` with `{Word}` for capitalized variants.
-- **`excluded_word_combinations`**: any password containing two or more of these substrings (case-insensitive) will be dropped.
+- **Words**: split on spaces, lowercased, optionally generalized (accents removed)
+- **Dates**: `YYYY-MM-DD` → `YYYY`, `YY`, `MM`, `DD`, `MMDD`, `DDMM`
+- **Numbers**: any digit groups
 
----
+## Resetting Your Config
 
-## Running the Generator
-
-```bash
-# Default config.json → wordlist.txt
-python main.py
-
-# Alternate config and output path
-python main.py --config myconfig.json --output custom-list.txt
-
-# Verbose logging
-python main.py --verbose
-```
-
----
-
-## Tips and Best Practices
-
-- **Pattern Design**: Keep patterns to the essential ones you need; avoid overly generic patterns unless necessary.
-- **Personal Data**: Use relevant personal info fields (names, dates, nicknames) but avoid leaving empty fields in the list if they’re unused.
-- **External Lists**: Append large, static lists (e.g., rockyou) with `external_wordlist`—pattern parsing is not applied to those entries.
-- **Filtering**: Tune `min_length`/`max_length` and exclusions to fit your targeting scope and policy constraints.
-
----
-
-## Contribution Guidelines
-
-1. Fork the repo.
-2. Create a feature branch (`git checkout -b feature-xyz`).
-3. Implement changes, include tests if relevant.
-4. Submit a pull request describing your enhancement.
-
-Contributions improving pattern expressivity, filtering options, or performance are welcome!
-
----
-
-## License
-
-Published under the MIT License. Feel free to adapt, extend, and integrate into your own workflows.
-
----
-
-_Generated by the refactored password generator team._
-
----
-
-## Resetting Configuration
-
-If you need to clear out all custom words, custom numbers, and personal information entries in your `config.json`, simply run:
+To clear out **all** custom entries (regardless of key names):
 
 ```bash
 python reset_config.py
 ```
 
-This script will reset the `custom.words`, `custom.numbers`, and all `custom.personal_info` fields back to empty values.
+## Security and Legal Notice
 
----
+**This tool is for authorized security testing and educational purposes only.**
 
-**Note**: This README was generated by GPT and the project is mostly "vibe coded" 😊
+- Ensure you have proper written authorization before testing any target
+- Only use on systems you own or have explicit permission to test
+- Follow all applicable laws and regulations in your jurisdiction
+- This tool should not be used for malicious purposes
