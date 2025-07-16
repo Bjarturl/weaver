@@ -32,6 +32,8 @@ Rename `config.example.json` to `config.json`. Customize:
   },
   "external_wordlist": "leaked.txt",
   "all_cases": true,
+  "min_length": 6,
+  "max_length": 20,
   "word_patterns": [
     "{word}",
     "{word}{number}",
@@ -50,6 +52,13 @@ Rename `config.example.json` to `config.json`. Customize:
 - **Arrays supported** - `["pet1", "pet2"]` works for multiple values
 - **`all_cases: true`** - Automatically generates both `admin` and `Admin` from `{word}` patterns
 - **External wordlist** - Added as-is (no pattern processing)
+- **Length filtering** - `min_length` and `max_length` filter generated passwords by character count
+
+**Length Parameters:**
+
+- Useful if you've seen a video/screenshot of someone logging in and can count password length
+- Can rule out certain lengths based on password policy or observations
+- Example: `"min_length": 8, "max_length": 15` for corporate environments
 
 ## Personal Information Gathering (OSINT)
 
@@ -98,6 +107,12 @@ https://target.com/author/username
 **Tools:**
 
 - **wpscan**: `wpscan --url https://target.com --enumerate u`
+
+**Wayback Machine:**
+
+- Check `https://web.archive.org/web/*/target.com/wp-json/wp/v2/users`
+- Look for historical author pages and user listings
+- May reveal usernames that no longer exist on current site
 
 **Common WordPress Usernames:**
 

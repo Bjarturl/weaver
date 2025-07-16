@@ -17,6 +17,8 @@ external_wordlist_file = config["external_wordlist"]
 output_file = config["output_file"]
 word_patterns = config["word_patterns"]
 all_cases = config.get("all_cases", False)
+min_length = config.get("min_length", 1)
+max_length = config.get("max_length", 100)
 
 
 def extract_ssn_standalone(personal_info):
@@ -373,6 +375,10 @@ def filter_passwords_with_multiple_numbers(passwords):
     return [p for p in passwords if not has_multiple_numeric_substrings(p)]
 
 
+def filter_passwords_by_length(passwords, min_length, max_length):
+    return [p for p in passwords if min_length <= len(p) <= max_length]
+
+
 def expand_patterns_for_all_cases(patterns, all_cases):
     if not all_cases:
         return patterns
@@ -471,6 +477,8 @@ pattern_passwords = generate_pattern_passwords(
     expanded_patterns, all_words, all_numbers, clean_special_chars)
 
 pattern_passwords = filter_passwords_with_multiple_numbers(pattern_passwords)
+pattern_passwords = filter_passwords_by_length(
+    pattern_passwords, min_length, max_length)
 
 external_wordlist = load_external_wordlist(external_wordlist_file)
 
