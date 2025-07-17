@@ -22,8 +22,10 @@ A customizable password wordlist generator for red teamers and OSINT practitione
 - Recursively flattens data structures
 - Converts dates like `YYYY-MM-DD` to multiple formats (`YYYY`, `YY`, `MMDD`, etc.)
 - Icelandic accent normalization (`þ`, `ð`, `æ`)
-- Case variants: lowercase, capitalized, UPPER
+- Case variants: lowercase, capitalized
 - Filters by length, uniqueness, exclusion rules
+- **Single number constraint**: Only one number group per password (e.g., won't combine `2023` + `2022`)
+- **Date extraction**: Years extracted as both 4-digit (`1999`) and 2-digit (`99`) formats
 - Merges external wordlists (e.g., RockYou)
 
 ## 🧠 OSINT Collection Guide
@@ -70,8 +72,6 @@ Gather **actual word-like info** someone might use in a password:
 
 write about check if you can sign up to determine password rules
 
-- Start simple: `{word}`, `{word}{number}`
-- Expand complexity: `{word}{special}{word2}`, `{word}{number}{special}`
 - Enable `all_cases` for capitalized/uppercase variants
 - Set `generalize_strings` to `"both"` for full normalization
 - Use `excluded_word_combinations` to avoid weak or meaningless combos

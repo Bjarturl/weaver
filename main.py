@@ -148,10 +148,35 @@ def main():
 
     patterns = cfg.get('word_patterns', [])
     if cfg.get('all_cases', False):
-        variants = [pat.replace('{word}', '{Word}') for pat in patterns]
-        for v in variants:
-            if v not in patterns:
-                patterns.append(v)
+        # Generate capitalized variations for all word placeholders
+        case_variants = []
+        for pat in patterns:
+            # Find all word placeholders in the pattern
+            word_placeholders = re.findall(
+                r'\{(word\d*)\}', pat, re.IGNORECASE)
+            if word_placeholders:
+                # Generate all case combinations for this pattern (lowercase + capitalized)
+                case_combinations = []
+                for placeholder in word_placeholders:
+                    # Create variations: lowercase, Capitalized (first letter only)
+                    case_combinations.append([
+                        placeholder.lower(),
+                        placeholder.lower().capitalize()
+                    ])
+
+                # Generate all possible combinations
+                for combo in itertools.product(*case_combinations):
+                    new_pattern = pat
+                    for old_placeholder, new_placeholder in zip(word_placeholders, combo):
+                        # Replace the first occurrence of each placeholder
+                        old_tag = f"{{{old_placeholder}}}"
+                        new_tag = f"{{{new_placeholder}}}"
+                        new_pattern = new_pattern.replace(old_tag, new_tag, 1)
+
+                    if new_pattern not in patterns:
+                        case_variants.append(new_pattern)
+
+        patterns.extend(case_variants)
 
     excl = cfg.get('excluded_word_combinations', [])
     if excl and all(isinstance(e, str) for e in excl):

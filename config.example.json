@@ -10,6 +10,7 @@
         ],
         "common_numbers": [
             "1234",
+            "123",
             "321",
             "1",
             "7"
@@ -17,36 +18,43 @@
         "common_special_chars": [
             "_",
             "-",
+            "#",
             ".",
             "!",
             "@",
             "*",
             "$"
         ],
-        "custom_words": [
-            "company"
-        ],
+        "custom_words": [],
         "custom_numbers": [
-            "1337"
+            "1337",
+            "2021",
+            "2022",
+            "2023"
         ],
         "personal_info": {
-            "name": "Jane Doe",
+            "name": "Jón Jónsson",
+            "company": "Fyrirtæki",
+            "website": "fyrirtaeki.is",
             "ssn": "0101013129",
             "ssn_last_4": "3129",
-            "wedding_anniversary": "",
-            "birth_date": "",
-            "pet_names": [],
-            "spouse_name": "",
-            "children_names": [],
-            "company_name": "",
-            "nickname": "",
-            "phone": ""
+            "wedding_anniversary": "2020-02-28",
+            "birth_date": "1978-05-05",
+            "pet_names": [
+                "snati"
+            ],
+            "spouse_name": "Snatsína",
+            "children_names": [
+                "Snáði"
+            ],
+            "nickname": "Nonni",
+            "phone": "1234567"
         }
     },
     "all_cases": true,
     "generalize_strings": true,
-    "min_length": 6,
-    "max_length": 14,
+    "min_length": 8,
+    "max_length": 18,
     "excluded_word_combinations": [
         [
             "sumar",
@@ -56,7 +64,12 @@
         ],
         [
             "admin",
-            "administrator"
+            "administrator",
+            "password"
+        ],
+        [
+            "Jón",
+            "Nonni"
         ]
     ],
     "word_patterns": [
