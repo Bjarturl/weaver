@@ -20,14 +20,14 @@ def reset_config():
         with open("config.json", "r", encoding="utf-8") as f:
             cfg = json.load(f)
 
-        if "custom" in cfg:
-            reset_section(cfg["custom"])
+        if "words" in cfg:
+            reset_section(cfg["words"])
 
         with open("config.json", "w", encoding="utf-8") as f:
             json.dump(cfg, f, indent=4)
 
         print("✅ Config reset successfully!")
-        print("All values under `custom` have been cleared.")
+        print("All values under `words` have been cleared.")
     except FileNotFoundError:
         print("❌ Error: config.json not found")
         sys.exit(1)

@@ -1,55 +1,65 @@
 {
-    "common_words": [
-        "admin",
-        "password",
-        "Vor",
-        "Sumar"
-    ],
-    "common_numbers": [
-        "123",
-        "2024",
-        "321",
-        "1"
-    ],
-    "common_special_chars": [
-        "!",
-        "?",
-        "#",
-        "$",
-        "."
-    ],
-    "custom": {
-        "words": [
-            "company",
-            "dept"
+    "words": {
+        "common_words": [
+            "admin",
+            "password",
+            "Vor",
+            "Sumar",
+            "Haust",
+            "Vetur"
         ],
-        "numbers": [
-            "8675309"
+        "common_numbers": [
+            "123",
+            "321",
+            "1",
+            "7"
+        ],
+        "common_special_chars": [
+            "!",
+            "?",
+            "#",
+            "$",
+            "."
+        ],
+        "custom_words": [
+            "company"
+        ],
+        "custom_numbers": [
+            "1337"
         ],
         "personal_info": {
             "name": "Jane Doe",
-            "birth_date": "1990-07-15",
-            "pet_names": [
-                "fido",
-                "milo"
-            ],
-            "ssn": ""
+            "ssn_last_4": "3419",
+            "wedding_anniversary": "",
+            "birth_date": "",
+            "pet_names": [],
+            "spouse_name": "",
+            "children_names": [],
+            "company_name": "",
+            "nickname": "",
+            "phone": ""
         }
     },
-    "external_wordlist": "rockyou.txt",
     "all_cases": true,
     "generalize_strings": true,
     "min_length": 6,
     "max_length": 14,
     "excluded_word_combinations": [
-        "sumar",
-        "vetur",
-        "haust",
-        "vor"
+        [
+            "sumar",
+            "vetur",
+            "haust",
+            "vor"
+        ],
+        [
+            "admin",
+            "administrator"
+        ]
     ],
     "word_patterns": [
         "{word}",
         "{word}{number}",
+        "{word}{number}{special}",
         "{word}{special}{word2}",
         "{number}{word2}",
         "{word}{word2}{number}{special}"

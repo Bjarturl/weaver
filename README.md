@@ -1,112 +1,108 @@
 # Password Wordlist Generator
 
-A flexible, config-driven tool for building targeted password lists from patterns, personal data, and common password elements.
+A simple, config-driven tool to build custom password lists from personal data, common words, and patterns.
 
-- **No code changes needed**  
-  Everything lives in `config.json`: words, numbers, specials, patterns, filters.
+## Features
 
-- **Free-form custom data**  
-  Under the top-level `"custom"` section you can add **any** keys—arrays or values of names, nicknames, dates, IDs, hobbies, whatever. The generator will recursively pick up every string or number, extract words, dates (YYYY-MM-DD → parts), and all digit-groups automatically.
+- **Config-only**: Define everything in `config.json` — no code edits needed.
+- **Auto extraction**: Recursively pulls strings, dates (`YYYY-MM-DD` → parts), numbers, and digit-groups from any nested fields under `words`.
+- **Flexible patterns**: Use `{word}`, `{word2}`, `{WORD3}`, `{number}`, `{special}`. Unlimited placeholders and case variants.
+- **Powerful filters**:
 
-  > _Note_: using a `"personal_info"` object is just a common convention, not a requirement.
+  - Length (`min_length`, `max_length`)
+  - Single numeric block (drops multiple number groups)
+  - Exclusions (drops passwords containing any two items from the same exclusion group)
 
-- **Dynamic patterns**  
-  Use `{word}`, `{word2}`, `{WORD3}`, `{number}`, `{special}` in your patterns.  
-  Placeholders are parsed at runtime, so you can add as many as you like.
-
-- **Built-in filters**
-
-  - Length (`min_length` / `max_length`)
-  - Single numeric substring (avoid multiple number blocks)
-  - Exclusions: any password containing any pair from any exclusion group in `excluded_word_combinations` is dropped.
-
-- **String processing options**
-
-  - `all_cases`: If `true`, automatically generates capitalized versions of `{word}` patterns (e.g., `{word}` → `{Word}`)
-  - `generalize_strings`: Controls accent/special character removal from extracted words
-    - `true` (default): Replace accented characters with ASCII equivalents (e.g., "grágás" → "gragas")
-    - `false`: Keep original characters as-is
-    - `"both"`: Include both original and generalized versions
-
-- **External lists**  
-  Append a raw wordlist via `external_wordlist` — no pattern filling applied.
-
-- **CLI options**
-  ```bash
-  python main.py [--config other.json] [--output list.txt] [--verbose]
-  ```
+- **Accent handling**: Strips or preserves accents based on `generalize_strings` (`true`, `false`, or `"both"`).
+- **Case options**: `all_cases: true` auto-adds capitalized `{Word}` variants.
+- **External lists**: Append raw wordlists via `--external-wordlist`.
 
 ## Quick Start
 
 1. Copy `config.example.json` → `config.json`.
-2. Tweak words, numbers, specials, patterns, filters.
-3. Under `"custom"`, add **any** fields — pick the key names to be convenient for you to fill out.
+2. Fill in `words` (any structure: `personal_info`, `hobbies`, etc.).
+3. Adjust `word_patterns`, `min_length`, `max_length`, and `excluded_word_combinations`.
 4. Run:
+
    ```bash
-   python main.py
+   python main.py [--config other.json] [--output list.txt] [--external-wordlist rockyou.txt] [--verbose]
    ```
-5. Your wordlist lands in `wordlist.txt` (or your chosen `output_file`).
 
-## Configuration Options
+5. Find your list in `wordlist.txt` (or your specified `output_file`).
 
-### Core Settings
-
-- `output_file`: Name of the generated wordlist file
-- `external_wordlist`: Path to an external wordlist to append (optional)
-- `min_length` / `max_length`: Password length constraints
-
-### Processing Options
-
-- `all_cases`: If `true`, automatically generates capitalized versions of `{word}` patterns
-- `generalize_strings`: Controls accent/special character removal from extracted words
-  - `true` (default): Replace accented characters with ASCII equivalents
-  - `false`: Keep original characters as-is
-  - `"both"`: Include both original and generalized versions
-
-### Word Sources
-
-- `common_words`: List of common words to use in patterns
-- `common_numbers`: List of common numbers to use in patterns
-- `common_special_chars`: List of special characters to use in patterns
-- `custom`: Nested object containing personal data (any structure allowed)
-
-### Pattern Generation
-
-- `word_patterns`: List of patterns using placeholders like `{word}`, `{number}`, `{special}`
-- `excluded_word_combinations`: List of word groups - passwords containing any pair from the same group will be excluded
-
-## Custom Data Extraction
-
-Every value under the `"custom"` section is processed—no fixed key names required:
+## Configuration Example
 
 ```json
-"custom": {
-  "personal_info": {
-    "full_name": "Jane Doe",
-    "pets": ["fido", "milo"]
+{
+  "output_file": "wordlist.txt",
+  "min_length": 6,
+  "max_length": 12,
+  "generalize_strings": true,
+  "all_cases": false,
+  "words": {
+    "personal_info": { "name": "Jane Doe", "pets": ["fido", "milo"] },
+    "common_words": ["admin", "password"],
+    "common_numbers": ["123", "2024"]
   },
-  "hobbies": ["skiing", "gaming"],
-  "national_id": "0123456789"
+  "word_patterns": ["{word}{number}", "{Word}{special}{word2}"],
+  "excluded_word_combinations": [
+    ["admin", "administrator"],
+    ["spring", "summer", "autumn", "winter"]
+  ]
 }
 ```
 
-- **Words**: split on spaces, lowercased, optionally generalized (accents removed)
-- **Dates**: `YYYY-MM-DD` → `YYYY`, `YY`, `MM`, `DD`, `MMDD`, `DDMM`
-- **Numbers**: any digit groups
+## Key Fields
 
-## Resetting Your Config
+- **words**: Any nested data; all strings/numbers processed.
+- **word_patterns**: Placeholder list.
+- **excluded_word_combinations**: Lists of items — any two in a password triggers exclusion. See `config.example.json` for examples.
+- **generalize_strings**: `true`, `false`, or `"both"`.
+- **all_cases**: `true` to auto-add capitalized patterns.
 
-To clear out **all** custom entries (regardless of key names):
+## Tips & Tricks
 
-```bash
-python reset_config.py
-```
+- **Start simple**: Begin with `{word}` and `{word}{number}` patterns.
+- **Add complexity gradually**: Incorporate specials and multiple words (e.g., `{word}{special}{word2}`).
+- **Use case variants**: Enable `all_cases` to capture uppercase and capitalized forms.
+- **Leverage both accents**: Set `generalize_strings` to `"both"` for original and accent-free words. Non accented letters are more likely though as some websites may forbid those and users have gotten used to having passwords like that.
+- **Align with real-world formats**: If you spot a date format (e.g., birthdays), include it under `words` as `YYYY-MM-DD` to auto-split.
+- **Password rules**: If you can register, note which password rules are required and configure the word patterns based on that.
+- **Combine external lists**: Use `--external-wordlist rockyou.txt` for broader coverage when personal data is limited.
 
-## Security and Legal Notice
+### OSINT Techniques
 
-**This tool is for authorized security testing and educational purposes only.**
+#### Social Media Research
 
-- Ensure you have proper written authorization before testing any target
-- Only use on systems you own or have explicit permission to test
-- Follow all applicable laws and regulations in your jurisdiction
-- This tool should not be used for malicious purposes
+- Facebook/Instagram profiles: personal info, pet names, family members.
+- Wedding photos: descriptions or comments for dates, locations, or names.
+- Spouse details: bios, tagged photos, comments mentioning a partner.
+- Hobbies: check photos or posts of common activities.
+- Children’s names: comments or posts by family.
+- Pet names: current and childhood pets in albums.
+- Historical content: captions on old photos for unique names or locations like boat/farm names.
+
+#### Professional Research
+
+- Company websites: staff directories, team pages, about sections.
+- LinkedIn: connections, job history, skills.
+- Username correlation: cross-reference usernames with company social media or directories.
+- Username enumeration: check login error differences to confirm account existence.
+- Google: Google the person's name if not too generic.
+- Demo recordings: check documentation, YouTube/Vimeo demos for login screenshots—note usernames and password length to adjust `min_length`/`max_length`.
+
+#### Iceland-Specific Research
+
+- Kennitala lookups: use services like íslendingabók or your heimabanki to find birth dates.
+- Phone numbers: search on ja.is.
+- Patronymic naming: for `-son`/`-dóttir`, search for likely parents in comments or likes.
+- Cross-generational posts: grandparents often share family details like children's names.
+
+#### Cultural & Seasonal Patterns
+
+- Seasonal words: `vor` (spring), `sumar` (summer), `haust` (autumn), `vetur` (winter).
+- Recent years: `2025`, `2024`, `2023`
+
+## Security Notice
+
+Use only with proper authorization. This tool is for ethical security testing and educational purposes only.
