@@ -1,113 +1,81 @@
-# Password Wordlist Generator
+# 🔐 Password Wordlist Generator
 
-A simple, config-driven tool to build custom password lists from personal data, common words, and patterns.
+A customizable password wordlist generator for red teamers and OSINT practitioners. Use personal and contextual data to build targeted password lists for ethical security testing.
 
-## Features
+## 🚀 Quick Start
 
-- **Config-only**: Define everything in `config.json` — no code edits needed.
-- **Auto extraction**: Recursively pulls strings, dates (`YYYY-MM-DD` → parts), numbers, and digit-groups from any nested fields under `words`.
-- **Flexible patterns**: Use `{word}`, `{word2}`, `{WORD3}`, `{number}`, `{special}`. Unlimited placeholders and case variants.
-- **Powerful filters**:
-
-  - Length (`min_length`, `max_length`)
-  - Single numeric block (drops multiple number groups)
-  - Exclusions (drops passwords containing any two items from the same exclusion group)
-
-- **Accent handling**: Strips or preserves accents based on `generalize_strings` (`true`, `false`, or `"both"`).
-- **Case options**: `all_cases: true` auto-adds capitalized `{Word}` variants.
-- **External lists**: Append raw wordlists via `--external-wordlist`.
-
-## Quick Start
-
-1. Copy `config.example.json` → `config.json`.
-2. Fill in `words` (any structure: `personal_info`, `hobbies`, etc.).
-3. Adjust `word_patterns`, `min_length`, `max_length`, and `excluded_word_combinations`.
-4. Run:
-
+1. **Setup**: Copy `config.example.json` → `config.json`
+2. **Reset (optional)**: Run `python reset_config.py` to clear example data
+3. **Edit config**: Fill in `config.json` with discovered personal info or desired keywords
+4. **Generate**:
    ```bash
-   python main.py [--config other.json] [--output list.txt] [--external-wordlist rockyou.txt] [--verbose]
+   python main.py
    ```
+   Optional flags:
+   - `--config <file>` — Use a custom config path
+   - `--output <file>` — Save output to a custom file
+   - `--external-wordlist <file>` — Merge with existing lists
 
-   To reset word config while preserving keys:
+## 🔧 Features
 
-   ```bash
-   python reset_config.py
-   ```
+- Template-based password generation: `{word}`, `{number}`, `{special}`
+- Recursively flattens data structures
+- Converts dates like `YYYY-MM-DD` to multiple formats (`YYYY`, `YY`, `MMDD`, etc.)
+- Icelandic accent normalization (`þ`, `ð`, `æ`)
+- Case variants: lowercase, capitalized, UPPER
+- Filters by length, uniqueness, exclusion rules
+- Merges external wordlists (e.g., RockYou)
 
-5. Find your list in `wordlist.txt` (or your specified `output_file`).
+## 🧠 OSINT Collection Guide
 
-## Configuration Example
+Gather **actual word-like info** someone might use in a password:
 
-```json
-{
-  "output_file": "wordlist.txt",
-  "min_length": 6,
-  "max_length": 12,
-  "generalize_strings": true,
-  "all_cases": false,
-  "words": {
-    "personal_info": { "name": "Jane Doe", "pets": ["fido", "milo"] },
-    "common_words": ["admin", "password"],
-    "common_numbers": ["123", "2024"]
-  },
-  "word_patterns": ["{word}{number}", "{Word}{special}{word2}"],
-  "excluded_word_combinations": [
-    ["admin", "administrator"],
-    ["spring", "summer", "autumn", "winter"]
-  ]
-}
-```
+### Social Media (Facebook, Instagram)
 
-## Key Fields
+- **Names**: person, partner, child, pets
+- **Hobbies**: Card/board game, sports teams, gamer handles, bands
+- **Place names**: Boat, farm, town
+- **Fandoms**: bands, games (e.g. "metallica", "zelda")
+- **Dates**: weddings, birthdays, anniversaries
+- **Cross-generational posts**: Grandparents often share family details like grandchildren's names in comments, or childhood pet names
 
-- **words**: Any nested data; all strings/numbers processed.
-- **word_patterns**: Placeholder list.
-- **excluded_word_combinations**: Lists of items — any two in a password triggers exclusion. See `config.example.json` for examples.
-- **generalize_strings**: `true`, `false`, or `"both"`.
-- **all_cases**: `true` to auto-add capitalized patterns.
+**Where to find this info:**
 
-## Tips & Tricks
+- **Facebook/Instagram profiles**: Look for personal info, pet names, family members in posts and photos
+- **Wedding photos**: Check descriptions and comments for date
+- **Spouse details**: Cross-reference bios, tagged photos, and comments mentioning partners
+- **Hobbies and interests**: Check photos or posts about activities, sports teams, favorite bands
+- **Children's names**: Often mentioned in comments or posts by family members
+- **Pet names**: Current and childhood pets visible in photo albums and stories
+- **Historical content**: Old photo captions can reveal unique names like boat names, farm names, or childhood nicknames
 
-- **Start simple**: Begin with `{word}` and `{word}{number}` patterns.
-- **Add complexity gradually**: Incorporate specials and multiple words (e.g., `{word}{special}{word2}`).
-- **Use case variants**: Enable `all_cases` to capture uppercase and capitalized forms.
-- **Leverage both accents**: Set `generalize_strings` to `"both"` for original and accent-free words. Non accented letters are more likely though as some websites may forbid those and users have gotten used to having passwords like that.
-- **Align with real-world formats**: If you spot a date format (e.g., birthdays), include it under `words` as `YYYY-MM-DD` to auto-split.
-- **Password rules**: If you can register, note which password rules are required and configure the word patterns based on that.
-- **Combine external lists**: Use `--external-wordlist rockyou.txt` for broader coverage when personal data is limited.
+### Professional (LinkedIn)
 
-### OSINT Techniques
+- **If you have only a username:**
+  - If vague (e.g. admin), check if it's a tech platform and look for a developer or sysadmin at the company
+  - On small sites, admin might map to one person
+- **If the username is a first name:**
+  - Search LinkedIn or company team pages to get full name
+- **Find email format:**
+  - Use `intext:"@target.is"` on Google to see how email addresses are structured for the company
 
-#### Social Media Research
+### Iceland-Specific
 
-- Facebook/Instagram profiles: personal info, pet names, family members.
-- Wedding photos: descriptions or comments for dates, locations, or names.
-- Spouse details: bios, tagged photos, comments mentioning a partner.
-- Hobbies: check photos or posts of common activities.
-- Children’s names: comments or posts by family.
-- Pet names: current and childhood pets in albums.
-- Historical content: captions on old photos for unique names or locations like boat/farm names.
+- **Names**: Last names lead to parent names via friend list or likes/comments
+- **Seasons + years**
+- **Phone**: `ja.is` or Facebook
+- **Kennitala + Address/Hometown**: Your heimabanki has a Þjóðskrá search by name.
 
-#### Professional Research
+## 🔑 Wordlist Strategy Tips
 
-- Company websites: staff directories, team pages, about sections.
-- LinkedIn: connections, job history, skills.
-- Username correlation: cross-reference usernames with company social media or directories.
-- Username enumeration: check login error differences to confirm account existence.
-- Google: Google the person's name if not too generic.
-- Demo recordings: check documentation, YouTube/Vimeo demos for login screenshots—note usernames and password length to adjust `min_length`/`max_length`.
+write about check if you can sign up to determine password rules
 
-#### Iceland-Specific Research
-
-- Kennitala lookups: use services like íslendingabók or your heimabanki to find birth dates.
-- Phone numbers: search on ja.is.
-- Patronymic naming: for `-son`/`-dóttir`, search for likely parents in comments or likes.
-- Cross-generational posts: grandparents often share family details like children's names.
-
-#### Cultural & Seasonal Patterns
-
-- Seasonal words: `vor` (spring), `sumar` (summer), `haust` (autumn), `vetur` (winter).
-- Recent years: `2025`, `2024`, `2023`
+- Start simple: `{word}`, `{word}{number}`
+- Expand complexity: `{word}{special}{word2}`, `{word}{number}{special}`
+- Enable `all_cases` for capitalized/uppercase variants
+- Set `generalize_strings` to `"both"` for full normalization
+- Use `excluded_word_combinations` to avoid weak or meaningless combos
+- Check company YouTube or software docs (if applicable) for admin login demos - note username and count password dots/asterisks to set exact `min_length`/`max_length`
 
 ## Security Notice
 

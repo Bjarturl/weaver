@@ -9,17 +9,19 @@
             "Vetur"
         ],
         "common_numbers": [
-            "123",
+            "1234",
             "321",
             "1",
             "7"
         ],
         "common_special_chars": [
+            "_",
+            "-",
+            ".",
             "!",
-            "?",
-            "#",
-            "$",
-            "."
+            "@",
+            "*",
+            "$"
         ],
         "custom_words": [
             "company"
@@ -29,7 +31,8 @@
         ],
         "personal_info": {
             "name": "Jane Doe",
-            "ssn_last_4": "3419",
+            "ssn": "0101013129",
+            "ssn_last_4": "3129",
             "wedding_anniversary": "",
             "birth_date": "",
             "pet_names": [],
