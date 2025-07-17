@@ -1,6 +1,5 @@
 import time
 import requests
-import sys
 import urllib3
 import re
 import argparse

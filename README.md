@@ -56,7 +56,7 @@ This can be used as a baseline if personal info about the user is scarce.
 
 The first critical step is identifying valid usernames. Strategies include:
 
-- **WordPress sites:** See the [XML-RPC README](https://github.com/Bjarturl/Password-generator/blob/main/xml-rpc/README.md) in this repo.
+- **WordPress sites:** See the [Wordpress README](https://github.com/Bjarturl/Password-generator/blob/main/xml-rpc/README.md) in this repo.
 - **Username enumeration:** Guess usernames and observe error messages:
 
   - Different response times or messages may indicate valid usernames.
