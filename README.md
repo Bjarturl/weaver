@@ -1,6 +1,6 @@
 # Password Wordlist Generator
 
-A customizable password wordlist generator for red teamers and OSINT practitioners. Use personal and contextual data to build targeted password lists for ethical security testing.
+A customizable password wordlist generator for bug bounty hunters and security professionals. Use personal and contextual data to build targeted password lists for ethical security testing.
 
 **Focused on efficiency**: Despite using multiple words, numbers, and patterns, the tool generates concise wordlists through intelligent filtering. For example, the included `config.example.json` produces only ~90,000 passwords despite containing numerous personal data points, ensuring quality over quantity.
 
