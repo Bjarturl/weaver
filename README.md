@@ -28,6 +28,12 @@ A simple, config-driven tool to build custom password lists from personal data, 
    python main.py [--config other.json] [--output list.txt] [--external-wordlist rockyou.txt] [--verbose]
    ```
 
+   To reset word config while preserving keys:
+
+   ```bash
+   python reset_config.py
+   ```
+
 5. Find your list in `wordlist.txt` (or your specified `output_file`).
 
 ## Configuration Example
