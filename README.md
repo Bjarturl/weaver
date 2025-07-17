@@ -162,6 +162,10 @@ Once you have a username and full name, gather additional personal details for t
   - `ja.is`
   - Facebook profiles
 
+Follow this structured approach thoroughly to maximize the chances of discovering valid login credentials and related password information.
+
+If your generated lists become too extensive, consider defining rules under excluded_word_combinations to skip unlikely combinations, such as multiple seasons (e.g., summer, winter, autumn, spring), since typically only one season is used.
+
 ## (TODO) Automation Suggestions
 
 If several users exist on a wordpress site new ones might regularly be getting created. consider scripting to automate:
@@ -169,12 +173,6 @@ If several users exist on a wordpress site new ones might regularly be getting c
 - Regularly checking WordPress REST API for newly created accounts.
 - Attempt quick logins using predetermined basic passwords on newly created accounts. like with the basic wordlist with seasons, year, company name etc. Or kennitala if you are fast enough to find the person.
 - If you can login, create your own account without changing the victims password to avoid detection.
-
----
-
-Follow this structured approach thoroughly to maximize the chances of discovering valid login credentials and related password information.
-
-If your generated lists become too extensive, consider defining rules under excluded_word_combinations to skip unlikely combinations, such as multiple seasons (e.g., summer, winter, autumn, spring), since typically only one season is used.
 
 ## Security Notice
 
