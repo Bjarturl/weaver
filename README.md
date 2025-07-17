@@ -1,8 +1,8 @@
-# 🔐 Password Wordlist Generator
+# Password Wordlist Generator
 
 A customizable password wordlist generator for red teamers and OSINT practitioners. Use personal and contextual data to build targeted password lists for ethical security testing.
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **Setup**: Copy `config.example.json` → `config.json`
 2. **Reset (optional)**: Run `python reset_config.py` to clear example data
@@ -16,7 +16,7 @@ A customizable password wordlist generator for red teamers and OSINT practitione
    - `--output <file>` — Save output to a custom file
    - `--external-wordlist <file>` — Merge with existing lists
 
-## 🔧 Features
+## Features
 
 - Template-based password generation: `{word}`, `{number}`, `{special}`
 - Recursively flattens data structures
@@ -28,54 +28,153 @@ A customizable password wordlist generator for red teamers and OSINT practitione
 - **Date extraction**: Years extracted as both 4-digit (`1999`) and 2-digit (`99`) formats
 - Merges external wordlists (e.g., RockYou)
 
-## 🧠 OSINT Collection Guide
-
-Gather **actual word-like info** someone might use in a password:
-
-### Social Media (Facebook, Instagram)
-
-- **Names**: person, partner, child, pets
-- **Hobbies**: Card/board game, sports teams, gamer handles, bands
-- **Place names**: Boat, farm, town
-- **Fandoms**: bands, games (e.g. "metallica", "zelda")
-- **Dates**: weddings, birthdays, anniversaries
-- **Cross-generational posts**: Grandparents often share family details like grandchildren's names in comments, or childhood pet names
-
-**Where to find this info:**
-
-- **Facebook/Instagram profiles**: Look for personal info, pet names, family members in posts and photos
-- **Wedding photos**: Check descriptions and comments for date
-- **Spouse details**: Cross-reference bios, tagged photos, and comments mentioning partners
-- **Hobbies and interests**: Check photos or posts about activities, sports teams, favorite bands
-- **Children's names**: Often mentioned in comments or posts by family members
-- **Pet names**: Current and childhood pets visible in photo albums and stories
-- **Historical content**: Old photo captions can reveal unique names like boat names, farm names, or childhood nicknames
-
-### Professional (LinkedIn)
-
-- **If you have only a username:**
-  - If vague (e.g. admin), check if it's a tech platform and look for a developer or sysadmin at the company
-  - On small sites, admin might map to one person
-- **If the username is a first name:**
-  - Search LinkedIn or company team pages to get full name
-- **Find email format:**
-  - Use `intext:"@target.is"` on Google to see how email addresses are structured for the company
-
-### Iceland-Specific
-
-- **Names**: Last names lead to parent names via friend list or likes/comments
-- **Seasons + years**
-- **Phone**: `ja.is` or Facebook
-- **Kennitala + Address/Hometown**: Your heimabanki has a Þjóðskrá search by name.
-
-## 🔑 Wordlist Strategy Tips
+## Wordlist Strategy Tips
 
 write about check if you can sign up to determine password rules
 
 - Enable `all_cases` for capitalized/uppercase variants
 - Set `generalize_strings` to `"both"` for full normalization
 - Use `excluded_word_combinations` to avoid weak or meaningless combos
-- Check company YouTube or software docs (if applicable) for admin login demos - note username and count password dots/asterisks to set exact `min_length`/`max_length`
+
+## Config.json Data and Username Discovery Guide
+
+## Baseline Password Wordlist Suggestions
+
+When creating wordlists, always include basic, commonly used keywords:
+
+- Company name
+- Website domain (e.g., `target.is`)
+- Seasons (`spring`, `summer`, `autumn`, `winter`)
+- Recent years (`2020`, `2021`, `2022`, etc.)
+- Simple numeric sequences (e.g., `12345`)
+
+This can be used as a baseline if personal info about the user is scarce.
+
+## Username Discovery
+
+### Finding Valid Usernames
+
+The first critical step is identifying valid usernames. Strategies include:
+
+- **WordPress sites:** See the [XML-RPC README](https://github.com/Bjarturl/Password-generator/blob/main/xml-rpc/README.md) in this repo.
+- **Username enumeration:** Guess usernames and observe error messages:
+
+  - Different response times or messages may indicate valid usernames.
+  - Use common usernames like `admin`, `user`, or employee names found on the company website or LinkedIn.
+
+- **Demos & documentation:** Check company YouTube or documentation for login screenshots or demo videos:
+
+  - Note usernames shown and count password dots/asterisks to determine password length (`min_length`/`max_length`).
+
+### Generic Usernames (e.g., `admin`, `user`, `test`)
+
+If you have generic usernames but don’t know the actual user:
+
+- Determine user roles based on the nature of the website:
+
+  - Marketing sites: Marketing manager usernames
+  - Technical sites: Developer or technical staff usernames
+
+- Google dorking:
+
+  ```
+  site:target.is intext:"<person name>"
+  ```
+
+- If no strong leads are identified, try generic password lists (seasons, numeric sequences, company-related terms) or popular wordlists. See Resources below.
+
+### Finding Emails
+
+If emails are required:
+
+- Google dorking:
+
+  ```
+  intext:"@target.is"
+  ```
+
+- Identify the company’s email format (e.g., `Firstname.Lastname@target.is`).
+
+### Expanding Username to Full Name
+
+If you only have a person’s first name as the username:
+
+- Check the company website or use Wayback Machine for historical employee listings.
+- Search LinkedIn and cross-reference with company employment. Might even be past employment but their account was never deactivated.
+- Check company social media posts and likes to visually match employees to Facebook/Instagram profiles. Companies often post staff photos from events and such.
+- Google dorking:
+
+  ```
+  intext:"<person name>" intext:"<company name>"
+  ```
+
+- If unsuccessful, revert to generic wordlists and temporary passwords.
+
+## Gathering Personal Information
+
+Once you have a username and full name, gather additional personal details for targeted password guesses:
+
+### Icelandic Social Security Number (Kennitala)
+
+- Use Þjóðskrá lookup (accessible via your heimabanki).
+- Kennitala can be a temporary password or part of one:
+
+  - Include entire SSN and last four digits separately in your `config.json`.
+
+- For common names, use the birth year digits (5th and 6th digits) to identify the correct person, if you manage to find their socials. Socials might give away where they are employed and you can use the photo to determine their age based on the birth year from their kennitala.
+
+### Social Media Investigation
+
+#### Facebook
+
+- Look for spouse, children, and close family (parents, siblings):
+  - Check comments, posts, likes for possible profiles.
+  - Pay attention to Icelandic surnames (`-son`, `-dóttir`) to infer parent and sibling names, but generic last names work too.
+- Note relationships from comments (birthday wishes, anniversaries). Spouse name might be mentioned with a post like "Hope x treats you well today" and from there you could try to find them in likes or comments.
+- Record spouse and family profiles for deeper investigation later.
+
+#### Personal Interests & Hobbies
+
+- Identify unique hobbies, interests, clubs, or activities:
+  - Avoid overly general interests (e.g., "cycling"). Opt for specific names/terms (clubs, sport teams, bands).
+  - Document pet names and significant property from their past (boat names, farm names).
+- Check for popular cultural interests (movies, books, series—e.g., Harry Potter) and add keywords from the franchise to your `config.json`.
+
+#### Important Dates
+
+- Birthdays (available via social media, kennitala, or Íslendingabók).
+- Wedding dates (photo description from wedding or wedding anniversary post date).
+
+#### Further Family Investigation
+
+- Investigate profiles of immediate family (parents/siblings):
+  - Check for childhood homes, pets, boats, or uniquely named properties.
+- Check for grandchildren names from their posts as well.
+
+### Instagram
+
+- Use similarly as Facebook, but recognize relatives may be harder to identify.
+- Infer family relationships from comments or likes if profiles are sparse.
+
+### Phone Number
+
+- Obtain phone numbers from:
+  - `ja.is`
+  - Facebook profiles
+
+## (TODO) Automation Suggestions
+
+If several users exist on a wordpress site new ones might regularly be getting created. consider scripting to automate:
+
+- Regularly checking WordPress REST API for newly created accounts.
+- Attempt quick logins using predetermined basic passwords on newly created accounts. like with the basic wordlist with seasons, year, company name etc. Or kennitala if you are fast enough to find the person.
+- If you can login, create your own account without changing the victims password to avoid detection.
+
+---
+
+Follow this structured approach thoroughly to maximize the chances of discovering valid login credentials and related password information.
+
+If your generated lists become too extensive, consider defining rules under excluded_word_combinations to skip unlikely combinations, such as multiple seasons (e.g., summer, winter, autumn, spring), since typically only one season is used.
 
 ## Security Notice
 
