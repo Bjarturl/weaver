@@ -2,6 +2,8 @@
 
 A customizable password wordlist generator for red teamers and OSINT practitioners. Use personal and contextual data to build targeted password lists for ethical security testing.
 
+**Focused on efficiency**: Despite using multiple words, numbers, and patterns, the tool generates concise wordlists through intelligent filtering. For example, the included `config.example.json` produces only ~90,000 passwords despite containing numerous personal data points, ensuring quality over quantity.
+
 ## Quick Start
 
 1. **Setup**: Copy `config.example.json` → `config.json`
@@ -18,25 +20,23 @@ A customizable password wordlist generator for red teamers and OSINT practitione
 
 ## Features
 
-- Template-based password generation: `{word}`, `{number}`, `{special}`
+- Template-based password generation: `{word}`,`{Word}`,`{word1}{Word2}`, `{number}`, `{special}`
 - Recursively flattens data structures
 - Converts dates like `YYYY-MM-DD` to multiple formats (`YYYY`, `YY`, `MMDD`, etc.)
 - Icelandic accent normalization (`þ`, `ð`, `æ`)
 - Case variants: lowercase, capitalized
-- Filters by length, uniqueness, exclusion rules
-- **Single number constraint**: Only one number group per password (e.g., won't combine `2023` + `2022`)
+- **Filtering**: Length limits, uniqueness checks, and exclusion rules keep lists concise
+- **Single number constraint**: Only one number group per password (e.g., won't combine `2023` + `2022`) by default.
 - **Date extraction**: Years extracted as both 4-digit (`1999`) and 2-digit (`99`) formats
-- Merges external wordlists (e.g., RockYou)
+- **Quality over quantity**: Advanced filtering produces focused wordlists rather than massive, unfocused ones
+- Appends external wordlists (e.g., RockYou) if desired
 
 ## Wordlist Strategy Tips
 
-write about check if you can sign up to determine password rules
+- Enable `all_cases` for capitalized/uppercase variants, or experiment with your own patterns
+- Use `excluded_word_combinations` to avoid weak or meaningless word combos. Any pair in the array will be excluded.
 
-- Enable `all_cases` for capitalized/uppercase variants
-- Set `generalize_strings` to `"both"` for full normalization
-- Use `excluded_word_combinations` to avoid weak or meaningless combos
-
-## Config.json Data and Username Discovery Guide
+# Data Collection and Username Discovery Guide
 
 ## Baseline Password Wordlist Suggestions
 
