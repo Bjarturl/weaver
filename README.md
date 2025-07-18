@@ -139,6 +139,7 @@ Once you have a username and full name, gather additional personal details for t
   - Avoid overly general interests (e.g., "cycling"). Opt for specific names/terms (clubs, sport teams, bands).
   - Document pet names and significant property from their past (boat names, farm names).
 - Check for popular cultural interests (movies, books, series—e.g., Harry Potter) and add keywords from the franchise to your `config.json`.
+- Google their name and identify sport teams they played for, gamer handles, clubs etc. 
 
 #### Important Dates
 
