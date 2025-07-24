@@ -74,11 +74,15 @@
     ],
     "word_patterns": [
         "{word}",
+        "{number}",
         "{word}{number}",
         "{word}{number}{special}",
         "{word}{special}{word2}",
-        "{number}{word2}",
-        "{word}{word2}{number}{special}"
+        "{word}{word2}{number}{special}",
+        "{word}{special}",
+        "{word}{word2}",
+        "{word}{special}{number}",
+        "{word}{word2}{number}"
     ],
     "output_file": "wordlist.txt"
 }
