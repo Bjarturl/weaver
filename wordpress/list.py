@@ -193,7 +193,8 @@ def check_methods(url, custom_header):
     methods = re.findall(r'<string>(.*?)</string>', response)
     print(bcolors.OKBLUE +
           f"[*] Retrieved {len(methods)} methods." + bcolors.ENDC)
-
+    if len(methods) == 0:
+        sys.exit(0)
     system_methods = {'system.multicall', 'system.listMethods'}
 
     if 'system.multicall' not in methods:
