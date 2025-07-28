@@ -1,6 +1,8 @@
 # Weaver
 
-**Weaver** is a command-line wordlist generator for creating custom password lists from structured combinations of words, numbers, and special characters. It's built for password auditing, authorized penetration testing, and bug bounty workflows.
+**Weaver** is a command-line wordlist generator for creating custom password lists from structured combinations of words, numbers, and special characters. It's bui| `--verbose` | ❌ | `false` | Enable detailed logging |
+| `--normalize` | ❌ | `false` | Unicode normalization |
+| `--pattern-mode` | ❌ | `as-is` | Case handling: `as-is`, `cap`, `any` |for password auditing, authorized penetration testing, and bug bounty workflows.
 
 ## Features
 
@@ -49,10 +51,6 @@ Special characters for passwords.
 --specials @symbols.txt
 ```
 
-### `--words-file WORDS_FILE`
-
-Single file with mixed content (words, numbers, specials). One item per line, comma-separated for groups.
-
 ### `--output OUTPUT` (Default: `wordlist.txt`)
 
 Output file path.
@@ -69,9 +67,9 @@ Maximum password length filter.
 
 Enable detailed logging with generation statistics.
 
-### `--generalize` (Always enabled)
+### `--normalize` (Default: disabled)
 
-Unicode normalization is always enabled: `café` → `cafe`, `résumé` → `resume`
+Enable Unicode normalization: `café` → `cafe`, `résumé` → `resume`
 
 ### `--pattern-mode {as-is,cap,any}` (Default: `as-is`)
 
@@ -156,7 +154,7 @@ ffuf -w wordlist.txt:FUZZ -X POST -d '{'username':'admin','password':'FUZZ'}' -H
 
 - Output is automatically deduplicated and sorted
 - Groups prevent conflicts (e.g., `summer` and `winter` together)
-- Unicode normalization removes accents when `--generalize` is enabled
+- Use `--normalize` to remove accents and diacritics from words
 - Start with OSINT reconnaissance for targeted wordlists
 - Use realistic patterns - people follow predictable password patterns
 - Adjust length filters to match target password policies
@@ -169,7 +167,6 @@ ffuf -w wordlist.txt:FUZZ -X POST -d '{'username':'admin','password':'FUZZ'}' -H
 | `--words`        | ❌       | Built-in list  | Word groups (semicolon/comma separated or @file)      |
 | `--numbers`      | ❌       | Built-in list  | Number groups (semicolon/comma separated or @file)    |
 | `--specials`     | ❌       | Built-in list  | Special chars (string, semicolon separated, or @file) |
-| `--words-file`   | ❌       | None           | Single file with mixed content                        |
 | `--output`       | ❌       | `wordlist.txt` | Output file path                                      |
 | `--min-length`   | ❌       | `1`            | Minimum password length                               |
 | `--max-length`   | ❌       | `100`          | Maximum password length                               |

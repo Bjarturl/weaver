@@ -13,34 +13,6 @@ def load_config(path):
         return json.load(f)
 
 
-def load_words_file(path):
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"Words file not found: {path}")
-
-    words = []
-    numbers = []
-    specials = []
-    groups = []
-
-    with open(path, 'r', encoding='utf-8') as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            if ',' in line:
-                group = [x.strip() for x in line.split(',') if x.strip()]
-                words.extend(group)
-                groups.append(group)
-            elif line.isdigit():
-                numbers.append(line)
-            elif not line.isalnum() and len(line) == 1:
-                specials.append(line)
-            else:
-                words.append(line)
-
-    return words, numbers, specials, groups
-
-
 def load_list_from_file(path):
     if not os.path.exists(path):
         raise FileNotFoundError(f"File not found: {path}")
@@ -202,8 +174,6 @@ def main():
     parser.add_argument('--numbers', help='Semicolon-separated or @file')
     parser.add_argument(
         '--specials', help='String, semicolon-separated or @file')
-    parser.add_argument(
-        '--words-file', help='Alternative single file with mixed values')
     parser.add_argument('--output', default='wordlist.txt',
                         help='Output file path')
     parser.add_argument('--min-length', type=int, default=1,
@@ -212,8 +182,8 @@ def main():
                         default=100, help='Maximum password length')
     parser.add_argument('--verbose', action='store_true',
                         help='Enable verbose logging')
-    parser.add_argument('--generalize', action='store_true', default=True,
-                        help='Enable Unicode normalization (default: on)')
+    parser.add_argument('--normalize', action='store_true', default=False,
+                        help='Enable Unicode normalization (default: off)')
     parser.add_argument('--pattern-mode', choices=['as-is', 'cap', 'any'], default='as-is',
                         help='How to interpret pattern cases: as-is (default), cap (lower + capitalized), any (lower + uppercase + capitalized)')
     args = parser.parse_args()
@@ -274,15 +244,6 @@ def main():
         else:
             specials, special_groups = [], []
 
-    elif args.words_file:
-        try:
-            words, numbers, specials, word_groups = load_words_file(
-                args.words_file)
-            number_groups = []
-            special_groups = []
-        except FileNotFoundError:
-            logging.error(f"Words file not found: {args.words_file}")
-            return
     else:
         words = []
         numbers = []
@@ -291,7 +252,7 @@ def main():
         number_groups = []
         special_groups = []
 
-    if args.generalize:
+    if args.normalize:
         words = list({generalize_string(w) for w in words})
 
     raw = generate_passwords(patterns, words, numbers, specials)
